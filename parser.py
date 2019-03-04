@@ -6,6 +6,12 @@ from enum import Enum
 # Base folder of audio files
 AUDIO_FOLDER = "audio"
 
+# Set up this param and DisVoice such that:
+# ./ + DISVOICE_FOLDER + /prosody/prosody.py
+# is a valid path
+DISVOICE_FOLDER = "disvoice"
+RUN_FEATURE_EXTRACTION = True
+
 ## Relevant Enum classes
 # Gender of the speaker
 class Gender(Enum):
@@ -29,14 +35,14 @@ class Emotion(Enum):
 class EmotionIntensity(Enum):
     Normal = 1
     Strong = 2
-
-
+    
 # Holds metadata for a single audio file
 class AudioFile():
     def __init__(self, path, filename):
         # Store params
         self.path = path
         self.full_filename = filename
+        self.folder_path = os.path.dirname(self.path)
 
         # Split full filename into file name and file extension
         self.filename, self.extension = os.path.splitext(self.full_filename)
@@ -75,6 +81,21 @@ class AudioFile():
         # The gender of the actor
         gender_int = self.actor_id % 2
         self.gender = Gender(gender_int)
+
+        # Read DisVoice results for this file
+        # Metadata is an array of 38 features from DisVoice
+        self.features = []
+        metadata_filename = self.filename + '.' + "txt"
+        metadata_path = os.path.join(self.folder_path, metadata_filename)
+        if os.path.isfile(metadata_path):
+            # Read metadata file
+            with open(metadata_path, 'r') as infile:
+                # Should only be one line
+                for line in infile:
+                    line = line.rstrip()
+                    self.features = line.split()
+        else:
+            print("Could not find {}".format(metadata_path))
     
 
 
@@ -87,10 +108,17 @@ class AudioParser():
         # Iterate through each actor's folder
         for actor_folder in os.listdir(AUDIO_FOLDER):
             # Get path of this actor folder
-            actor_folderpath = os.path.join(AUDIO_FOLDER, actor_folder)
+            actor_folderpath = os.path.join(os.getcwd(), AUDIO_FOLDER, actor_folder)
 
             # Iterate through each of the actor's sound files
             for audio_filename in os.listdir(actor_folderpath):
+                # Check this is .wav file
+                _, extension = os.path.splitext(audio_filename)
+
+                # Ignore non-wav files
+                if extension != ".wav":
+                    continue
+
                 # Get relative path of this sound file
                 audio_filepath = os.path.join(actor_folderpath, audio_filename)
 
@@ -102,4 +130,5 @@ class AudioParser():
 
 
 a = AudioParser()
-print(a.audio_files[1].gender)
+print(a.audio_files[0].features)
+
