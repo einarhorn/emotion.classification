@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+
+####
+## NOTE: This code is not necessary to use, since file in audio folder have already been stripped of metadata.
+####
+
 import os
 ## Strips metadata from all audio files in top 2 levels of AUDIO_FOLDER folder
 ## This is an optional step. Some wav files have metadata that causes the DisVoice feature extraction step to fail
-## Requires FFMPEG
+## NOTE: Requires FFMPEG
 AUDIO_FOLDER = 'audio'
 
 
@@ -13,8 +18,6 @@ for actor_folder in os.listdir(AUDIO_FOLDER):
     for audio_filename in os.listdir(actor_folderpath):
         audio_filepath = os.path.join(actor_folderpath, audio_filename)
 
+        # Wipe metadata with ffmpeg
         query = "ffmpeg -i {} -map_metadata -1 -c:v copy -c:a copy {} -y".format(audio_filepath, audio_filepath)
-        # print(query)
-        # import sys
-        # sys.exit()
         os.system(query)

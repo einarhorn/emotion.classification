@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+####
+## NOTE: This code is not necessary to use, since feature extraction results have already been stored in the audio folder.
+####
+
 import os
 ## Runs feature extraction using DisVoice
 AUDIO_FOLDER = 'audio'
@@ -22,14 +26,11 @@ for actor_folder in os.listdir(AUDIO_FOLDER):
         feature_filepath= os.path.join(actor_folderpath, feature_filename)
 
         # Run feature extraction on this file
-        # print(audio_filepath)
-        # print(feature_filepath)
         print("python3 ./" + DISVOICE_FOLDER + "/prosody/prosody.py {} {}".format(audio_filepath, feature_filepath))
         res = os.system("python3 ./" + DISVOICE_FOLDER + "/prosody/prosody.py {} {}".format(audio_filepath, feature_filepath))
         if int(res) != 0:
             to_delete.append(audio_filepath)
-        # import sys
-        # sys.exit()
+
 print("The following files caused an issue in disvoice")
 for err in to_delete:
     print(err)

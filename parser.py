@@ -11,6 +11,7 @@ AUDIO_FOLDER = "audio"
 # is a valid path
 DISVOICE_FOLDER = "disvoice"
 RUN_FEATURE_EXTRACTION = True
+DATA_FILE = "data.csv"
 
 ## Relevant Enum classes
 # Gender of the speaker
@@ -56,12 +57,12 @@ class AudioFile():
         # self.vocal_channel = split_filename[1]
 
         # The emotion annotation
-        emotion_int = int(split_filename[2])
-        self.emotion = Emotion(emotion_int)
+        self.emotion_int = int(split_filename[2])
+        self.emotion = Emotion(self.emotion_int)
 
         # Whether this emotion was done "strong" or "normal"
-        emotion_intensity_int = int(split_filename[3])
-        self.emotion_intensity = EmotionIntensity(emotion_intensity_int)
+        self.emotion_intensity_int = int(split_filename[3])
+        self.emotion_intensity = EmotionIntensity(self.emotion_intensity_int)
 
         # The id of the text of the utterance (1 or 2)
         self.statement = int(split_filename[4])
@@ -79,8 +80,8 @@ class AudioFile():
         self.actor_id = int(split_filename[6])
 
         # The gender of the actor
-        gender_int = self.actor_id % 2
-        self.gender = Gender(gender_int)
+        self.gender_int = self.actor_id % 2
+        self.gender = Gender(self.gender_int)
 
         # Read DisVoice results for this file
         # Metadata is an array of 38 features from DisVoice
@@ -97,6 +98,12 @@ class AudioFile():
         else:
             print("Could not find {}".format(metadata_path))
     
+    def to_csv_line(self):
+        line_arr = [self.filename, self.emotion_int, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
+        line_arr += self.features
+        line_arr = [str(item) for item in line_arr]
+        return ",".join(line_arr)
+
 
 
 # Holds all of our audio files
@@ -126,9 +133,64 @@ class AudioParser():
                 audio_file = AudioFile(audio_filepath, audio_filename)
                 self.audio_files.append(audio_file)
 
+    def header_csv(self):
+        header = ["filename", "emotion", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        features = [
+            "Average fundamental frequency in voiced segments",
+            "Standard deviation of fundamental frequency in Hz",
+            "Variablity of fundamental frequency in semitones",
+            "Maximum of the fundamental frequency in Hz",
+            "Average energy in dB",
+            "Standard deviation of energy in dB",
+            "Maximum energy",
+            "Voiced rate (number of voiced segments per second)",
+            "Average duration of voiced segments",
+            "Standard deviation of duration of voiced segments",
+            "Pause rate (number of pauses per second)",
+            "Average duration of pauses",
+            "Standard deviation of duration of pauses ",
+            "Average tilt of fundamental frequency",
+            "Tilt regularity of fundamental frequency",
+            "Mean square error of the reconstructed F0 with a 1-degree polynomial",
+            "(Silence duration)/(Voiced+Unvoiced durations)",
+            "(Voiced duration)/(Unvoiced durations)",
+            "(Unvoiced duration)/(Voiced+Unvoiced durations)",
+            "(Voiced duration)/(Voiced+Unvoiced durations)",
+            "(Voiced duration)/(Silence durations)",
+            "(Unvoiced duration)/(Silence durations)",
+            "Unvoiced duration Regularity",
+            "Unvoiced energy Regularity",
+            "Voiced duration Regularity",
+            "Voiced energy Regularity",
+            "Pause duration Regularity",
+            "Maximum duration of voiced segments",
+            "Maximum duration of unvoiced segments",
+            "Minimum duration of voiced segments",
+            "Minimum duration of unvoiced segments",
+            "rate (# of voiced segments) / (# of unvoiced segments)",
+            "Average tilt of energy contour",
+            "Regression coefficient between the energy contour and a linear regression",
+            "Mean square error of the reconstructed energy contour with a 1-degree polynomial",
+            "Regression coefficient between the F0 contour and a linear regression",
+            "Average Delta energy within consecutive voiced segments",
+            "Standard deviation of Delta energy within consecutive voiced segments",
+        ]
+        line = header + features
+        return ",".join(line)
 
 
 
-a = AudioParser()
-print(a.audio_files[0].features)
 
+def create_dataset():
+    a = AudioParser()
+    # print(a.audio_files[0].features)
+
+    with open(DATA_FILE, 'w') as outfile:
+        outfile.write("{}\n".format(a.header_csv()))
+        for audio_item in a.audio_files:
+            outfile.write("{}\n".format(audio_item.to_csv_line()))
+
+
+
+if __name__ == "__main__":
+    create_dataset()
