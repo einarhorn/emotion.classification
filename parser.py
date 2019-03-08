@@ -12,6 +12,7 @@ AUDIO_FOLDER = "audio"
 DISVOICE_FOLDER = "disvoice"
 RUN_FEATURE_EXTRACTION = True
 DATA_FILE = "data.csv"
+ARTICULATION_DATA_FILE = "data.articulation.csv"
 
 ## Relevant Enum classes
 # Gender of the speaker
@@ -97,10 +98,31 @@ class AudioFile():
                     self.features = line.split()
         else:
             print("Could not find {}".format(metadata_path))
+
+        # Read DisVoice articulation results for this file
+        # articulation_metadata is an array of 488 features from DisVoice
+        self.articulation_features = []
+        articulation_metadata_filename = self.filename + '.articulation.' + "txt"
+        articulation_metadata_path = os.path.join(self.folder_path, articulation_metadata_filename)
+        if os.path.isfile(articulation_metadata_path):
+            # Read metadata file
+            with open(articulation_metadata_path, 'r') as infile:
+                # Should only be one line
+                for line in infile:
+                    line = line.rstrip()
+                    self.articulation_features = line.split()
+        else:
+            print("Could not find {}".format(articulation_metadata_path))
     
     def to_csv_line(self):
         line_arr = [self.filename, self.emotion_int, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
         line_arr += self.features
+        line_arr = [str(item) for item in line_arr]
+        return ",".join(line_arr)
+    
+    def to_csv_articulation_line(self):
+        line_arr = [self.filename, self.emotion_int, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
+        line_arr += self.articulation_features
         line_arr = [str(item) for item in line_arr]
         return ",".join(line_arr)
 
@@ -177,6 +199,15 @@ class AudioParser():
         ]
         line = header + features
         return ",".join(line)
+    
+    def header_articulation_csv(self):
+        header = ["filename", "emotion", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        features = [
+            "Articulation [122 descriptors * 4 functionals: mean, std, skewness, kurtosis]"
+        ]
+        line = header + features
+        return ",".join(line)
+    
 
 
 
@@ -185,10 +216,17 @@ def create_dataset():
     a = AudioParser()
     # print(a.audio_files[0].features)
 
+    # Accoustic features
     with open(DATA_FILE, 'w') as outfile:
         outfile.write("{}\n".format(a.header_csv()))
         for audio_item in a.audio_files:
             outfile.write("{}\n".format(audio_item.to_csv_line()))
+    
+    # Articulation
+    with open(ARTICULATION_DATA_FILE, 'w') as outfile:
+        outfile.write("{}\n".format(a.header_articulation_csv()))
+        for audio_item in a.audio_files:
+            outfile.write("{}\n".format(audio_item.to_csv_articulation_line()))
 
 
 
