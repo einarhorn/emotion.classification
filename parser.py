@@ -12,8 +12,9 @@ SONG_FOLDER = "song"
 # is a valid path
 DISVOICE_FOLDER = "disvoice"
 RUN_FEATURE_EXTRACTION = True
-DATA_FILE = "data.csv"
+DATA_FILE = "data.prosody.csv"
 ARTICULATION_DATA_FILE = "data.articulation.csv"
+COMBINED_DATA_FILE = "data.combined.csv"
 
 ## Relevant Enum classes
 # Gender of the speaker
@@ -127,6 +128,12 @@ class AudioFile():
         line_arr = [str(item) for item in line_arr]
         return ",".join(line_arr)
 
+    def to_csv_combined_line(self):
+        line_arr = [self.filename, self.emotion_int, self.vocal_channel, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
+        line_arr += self.features
+        line_arr += self.articulation_features
+        line_arr = [str(item) for item in line_arr]
+        return ",".join(line_arr)
 
 
 # Holds all of our audio files
@@ -178,10 +185,8 @@ class AudioParser():
                 # Create audio instance and store in our list
                 audio_file = AudioFile(audio_filepath, audio_filename)
                 self.song_files.append(audio_file)
-
-    def header_csv(self):
-        header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
-        features = [
+            
+        self.prosody_features = [
             "Average fundamental frequency in voiced segments",
             "Standard deviation of fundamental frequency in Hz",
             "Variablity of fundamental frequency in semitones",
@@ -221,12 +226,8 @@ class AudioParser():
             "Average Delta energy within consecutive voiced segments",
             "Standard deviation of Delta energy within consecutive voiced segments",
         ]
-        line = header + features
-        return ",".join(line)
-    
-    def header_articulation_csv(self):
-        header = ["filename", "emotion", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
-        features = [
+
+        self.articulation_features = [
             'Bark band energies in onset transitions (22 BBE) [0] [mean]',
             'Bark band energies in onset transitions (22 BBE) [1] [mean]',
             'Bark band energies in onset transitions (22 BBE) [2] [mean]',
@@ -716,8 +717,20 @@ class AudioParser():
             'First derivative of the Second formant Frequency [kurtosis]',
             'Second derivative of the Second formant Frequency [kurtosis]'
         ]
-        
-        line = header + features
+
+    def header_csv(self):
+        header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        line = header + self.prosody_features
+        return ",".join(line)
+    
+    def header_articulation_csv(self):
+        header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        line = header + self.articulation_features
+        return ",".join(line)
+    
+    def header_combined_csv(self):
+        header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        line = header + self.prosody_features + self.articulation_features
         return ",".join(line)
     
 
@@ -745,6 +758,12 @@ def create_dataset():
         
         for audio_item in a.song_files:
             outfile.write("{}\n".format(audio_item.to_csv_articulation_line()))
+    
+    # Combined
+    with open(COMBINED_DATA_FILE, 'w') as outfile:
+        outfile.write("{}\n".format(a.header_combined_csv()))
+        for audio_item in a.audio_files:
+            outfile.write("{}\n".format(audio_item.to_csv_combined_line()))
 
 
 
