@@ -1,0 +1,41 @@
+Feature,P-value,F-val,Significance
+MFCC[34],0.0,336.3,Significant
+MFCC[31],0.0,232.88,Significant
+MFCC[38],0.0,221.52,Significant
+MFCC[1],0.0,213.52,Significant
+MFCC[30],0.0,174.64,Significant
+MFCC[39],0.0,112.1,Significant
+MFCC[33],0.0,108.01,Significant
+MFCC[3],0.0,104.72,Significant
+MFCC[36],0.0,95.37,Significant
+MFCC[35],0.0,88.7,Significant
+MFCC[32],0.0,60.8,Significant
+MFCC[6],0.0,49.72,Significant
+MFCC[24],0.0,43.71,Significant
+MFCC[9],0.0,42.65,Significant
+MFCC[21],0.0,37.7,Significant
+MFCC[22],0.0,34.21,Significant
+MFCC[40],0.0,29.78,Significant
+MFCC[20],0.0,26.02,Significant
+MFCC[25],0.0,19.5,Significant
+MFCC[29],0.0,15.78,Significant
+MFCC[19],0.0,14.84,Significant
+MFCC[27],1e-06,13.93,Significant
+MFCC[18],3e-06,12.88,Significant
+MFCC[11],2.5e-05,10.73,Significant
+MFCC[37],3.6e-05,10.35,Significant
+MFCC[15],3.8e-05,10.28,Significant
+MFCC[8],0.00153,6.52,Significant
+MFCC[23],0.003755,5.62,Significant
+MFCC[16],0.004841,5.36,Significant
+MFCC[7],0.008706,4.77,Significant
+MFCC[5],0.009124,4.72,Significant
+MFCC[28],0.014667,4.24,Significant
+MFCC[26],0.026732,3.63,Significant
+MFCC[14],0.070303,2.66,Not Significant
+MFCC[17],0.100464,2.3,Not Significant
+MFCC[12],0.218991,1.52,Not Significant
+MFCC[2],0.296115,1.22,Not Significant
+MFCC[13],0.351607,1.05,Not Significant
+MFCC[10],0.465502,0.77,Not Significant
+MFCC[4],0.858088,0.15,Not Significant

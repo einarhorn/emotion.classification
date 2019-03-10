@@ -1,0 +1,30 @@
+Feature,P-value,F-val,Significance
+Maximum of the fundamental frequency in Hz,0.0,101.29,Significant
+Variablity of fundamental frequency in semitones,0.0,80.36,Significant
+Average fundamental frequency in voiced segments,0.0,70.68,Significant
+Pause duration Regularity,0.0,51.45,Significant
+Mean square error of the reconstructed F0 with a 1-degree polynomial,0.0,51.35,Significant
+(Silence duration)/(Voiced+Unvoiced durations),0.0,47.22,Significant
+Tilt regularity of fundamental frequency,0.0,38.72,Significant
+Regression coefficient between the F0 contour and a linear regression,0.0,37.86,Significant
+Average energy in dB,0.0,34.5,Significant
+Standard deviation of energy in dB,0.0,28.85,Significant
+Regression coefficient between the energy contour and a linear regression,0.0,26.49,Significant
+Average duration of pauses,0.0,23.15,Significant
+Minimum duration of voiced segments,0.0,22.01,Significant
+rate (# of voiced segments) / (# of unvoiced segments),0.0,19.8,Significant
+Mean square error of the reconstructed energy contour with a 1-degree polynomial,0.0,18.83,Significant
+Average tilt of energy contour,0.0,17.13,Significant
+Average Delta energy within consecutive voiced segments,0.0,16.56,Significant
+Voiced energy Regularity,0.0,16.37,Significant
+Unvoiced energy Regularity,0.0,15.45,Significant
+Average duration of voiced segments,0.0,10.68,Significant
+Standard deviation of Delta energy within consecutive voiced segments,0.0,10.51,Significant
+Standard deviation of duration of pauses ,0.0,8.58,Significant
+(Unvoiced duration)/(Silence durations),0.0,7.97,Significant
+Standard deviation of duration of voiced segments,6e-06,5.29,Significant
+Voiced duration Regularity,0.00015,4.17,Significant
+Maximum energy,0.001093,3.47,Significant
+Average tilt of fundamental frequency,0.006156,2.83,Significant
+(Voiced duration)/(Unvoiced durations),0.025066,2.3,Significant
+Unvoiced duration Regularity,0.639359,0.74,Not Significant
