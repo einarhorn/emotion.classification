@@ -15,7 +15,7 @@ RUN_FEATURE_EXTRACTION = True
 DATA_FILE = "data.prosody.csv"
 ARTICULATION_DATA_FILE = "data.articulation.csv"
 COMBINED_DATA_FILE = "data.combined.csv"
-
+MFCC_DATA_FILE = "data.mfcc.csv"
 ## Relevant Enum classes
 # Gender of the speaker
 class Gender(Enum):
@@ -60,8 +60,8 @@ class AudioFile():
         self.vocal_channel = int(split_filename[1])
 
         # The emotion annotation
-        self.emotion_int = int(split_filename[2])
-        self.emotion = Emotion(self.emotion_int)
+        self.emotion_int = int(split_filename[2]) - 1
+        # self.emotion = Emotion(self.emotion_int)
 
         # Whether this emotion was done "strong" or "normal"
         self.emotion_intensity_int = int(split_filename[3])
@@ -115,6 +115,19 @@ class AudioFile():
                     self.articulation_features = line.split()
         else:
             print("Could not find {}".format(articulation_metadata_path))
+        
+        self.mfcc_features = []
+        mfcc_metadata_filename = self.filename + '.librosa_mfcc.' + "txt"
+        mfcc_metadata_path = os.path.join(self.folder_path, mfcc_metadata_filename)
+        if os.path.isfile(mfcc_metadata_path):
+            # Read metadata file
+            with open(mfcc_metadata_path, 'r') as infile:
+                # Should only be one line
+                for line in infile:
+                    line = line.rstrip()
+                    self.mfcc_features = line.split()
+        else:
+            print("Could not find {}".format(articulation_metadata_path))
     
     def to_csv_line(self):
         line_arr = [self.filename, self.emotion_int, self.vocal_channel, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
@@ -133,6 +146,22 @@ class AudioFile():
         line_arr += self.features
         line_arr += self.articulation_features
         line_arr = [str(item) for item in line_arr]
+        return ",".join(line_arr)
+    
+    def to_csv_mfcc_line(self):
+        line_arr = [self.filename, self.emotion_int, self.vocal_channel, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
+        # all_feats = []
+        # all_feats += self.articulation_features[22:58]
+        # all_feats += self.articulation_features[80:116]
+        # all_feats += self.articulation_features[22+122*1:58+122*1]
+        # all_feats += self.articulation_features[80+122*1:116+122*1]
+        # all_feats += self.articulation_features[22+122*2:58+122*2]
+        # all_feats += self.articulation_features[80+122*2:116+122*2]
+        # all_feats += self.articulation_features[22+122*3:58+122*3]
+        # all_feats += self.articulation_features[80+122*3:116+122*3]
+        line_arr += self.mfcc_features
+        line_arr = [str(item) for item in line_arr]
+        # print(len(line_arr))
         return ",".join(line_arr)
 
 
@@ -718,6 +747,340 @@ class AudioParser():
             'Second derivative of the Second formant Frequency [kurtosis]'
         ]
 
+        self.mfcc_feature_headers = [
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [0] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [1] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [2] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [3] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [4] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [5] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [6] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [7] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [8] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [9] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [10] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [11] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [0] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [1] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [2] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [3] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [4] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [5] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [6] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [7] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [8] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [9] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [10] [mean]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [11] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [0] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [1] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [2] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [3] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [4] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [5] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [6] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [7] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [8] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [9] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [10] [mean]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [11] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [0] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [1] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [2] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [3] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [4] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [5] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [6] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [7] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [8] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [9] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [10] [mean]',
+            'MFCCC in offset transitions (12 MFCC offset) [11] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [mean]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [mean]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [mean]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [0] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [1] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [2] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [3] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [4] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [5] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [6] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [7] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [8] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [9] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [10] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [11] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [0] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [1] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [2] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [3] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [4] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [5] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [6] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [7] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [8] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [9] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [10] [std]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [11] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [0] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [1] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [2] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [3] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [4] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [5] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [6] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [7] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [8] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [9] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [10] [std]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [11] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [0] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [1] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [2] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [3] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [4] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [5] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [6] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [7] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [8] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [9] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [10] [std]',
+            'MFCCC in offset transitions (12 MFCC offset) [11] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [std]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [std]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [std]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [0] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [1] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [2] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [3] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [4] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [5] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [6] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [7] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [8] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [9] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [10] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [11] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [0] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [1] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [2] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [3] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [4] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [5] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [6] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [7] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [8] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [9] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [10] [skewness]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [11] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [0] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [1] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [2] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [3] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [4] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [5] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [6] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [7] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [8] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [9] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [10] [skewness]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [11] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [0] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [1] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [2] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [3] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [4] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [5] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [6] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [7] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [8] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [9] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [10] [skewness]',
+            'MFCCC in offset transitions (12 MFCC offset) [11] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [skewness]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [skewness]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [skewness]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [0] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [1] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [2] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [3] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [4] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [5] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [6] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [7] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [8] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [9] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [10] [kurtosis]',
+            'Mel frequency cepstral coefficients in onset transitions (12 MFCC onset) [11] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [0] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [1] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [2] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [3] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [4] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [5] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [6] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [7] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [8] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [9] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [10] [kurtosis]',
+            'First derivative of the MFCCs in onset transitions (12 DMFCC onset) [11] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [0] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [1] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [2] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [3] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [4] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [5] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [6] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [7] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [8] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [9] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [10] [kurtosis]',
+            'Second derivative of the MFCCs in onset transitions (12 DDMFCC onset) [11] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [0] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [1] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [2] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [3] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [4] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [5] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [6] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [7] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [8] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [9] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [10] [kurtosis]',
+            'MFCCC in offset transitions (12 MFCC offset) [11] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [kurtosis]',
+            'First derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [0] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [1] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [2] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [3] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [4] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [5] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [6] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [7] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [8] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [9] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [10] [kurtosis]',
+            'Second derivative of the MFCCs in offset transitions (12 DMFCC offset) [11] [kurtosis]',
+        ]
+    
+        self.librosa_mfcc_headers = [
+            'MFCC[1]',
+            'MFCC[2]',
+            'MFCC[3]',
+            'MFCC[4]',
+            'MFCC[5]',
+            'MFCC[6]',
+            'MFCC[7]',
+            'MFCC[8]',
+            'MFCC[9]',
+            'MFCC[10]',
+            'MFCC[11]',
+            'MFCC[12]',
+            'MFCC[13]',
+            'MFCC[14]',
+            'MFCC[15]',
+            'MFCC[16]',
+            'MFCC[17]',
+            'MFCC[18]',
+            'MFCC[19]',
+            'MFCC[20]',
+            'MFCC[21]',
+            'MFCC[22]',
+            'MFCC[23]',
+            'MFCC[24]',
+            'MFCC[25]',
+            'MFCC[26]',
+            'MFCC[27]',
+            'MFCC[28]',
+            'MFCC[29]',
+            'MFCC[30]',
+            'MFCC[31]',
+            'MFCC[32]',
+            'MFCC[33]',
+            'MFCC[34]',
+            'MFCC[35]',
+            'MFCC[36]',
+            'MFCC[37]',
+            'MFCC[38]',
+            'MFCC[39]',
+            'MFCC[40]',
+        ]
+
     def header_csv(self):
         header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
         line = header + self.prosody_features
@@ -731,6 +1094,12 @@ class AudioParser():
     def header_combined_csv(self):
         header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
         line = header + self.prosody_features + self.articulation_features
+        return ",".join(line)
+    
+    def header_mfcc_only(self):
+        header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
+        line = header + self.librosa_mfcc_headers
+        # print(len(line))
         return ",".join(line)
     
 
@@ -765,6 +1134,13 @@ def create_dataset():
         for audio_item in a.audio_files:
             outfile.write("{}\n".format(audio_item.to_csv_combined_line()))
 
+    # MFCC
+    with open(MFCC_DATA_FILE, 'w') as outfile:
+        outfile.write("{}\n".format(a.header_mfcc_only()))
+        for audio_item in a.audio_files:
+            outfile.write("{}\n".format(audio_item.to_csv_mfcc_line()))
+        for audio_item in a.song_files:
+            outfile.write("{}\n".format(audio_item.to_csv_mfcc_line()))
 
 
 if __name__ == "__main__":

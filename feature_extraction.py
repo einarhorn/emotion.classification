@@ -4,7 +4,7 @@
 ## NOTE: This code is not necessary to use, since feature extraction results have already been stored in the audio folder.
 ####
 
-import os
+import os, librosa, numpy, sys
 
 
 
@@ -21,29 +21,42 @@ phonation_info = []
 cwd = os.getcwd()
 
 # Iterate through all actor folders and then audio files
-# for actor_folder in os.listdir(AUDIO_FOLDER):
-#     actor_folderpath = os.path.join(os.getcwd(), AUDIO_FOLDER, actor_folder)
-#     for audio_filename in os.listdir(actor_folderpath):
-#         audio_filepath = os.path.join(actor_folderpath, audio_filename)
+for actor_folder in os.listdir(AUDIO_FOLDER):
+    actor_folderpath = os.path.join(os.getcwd(), AUDIO_FOLDER, actor_folder)
+    for audio_filename in os.listdir(actor_folderpath):
+        audio_filepath = os.path.join(actor_folderpath, audio_filename)
 
-#         # Get raw filename and extension of file
-#         filename, extension = os.path.splitext(audio_filepath)
-#         if extension != ".wav":
-#             continue
+        # Get raw filename and extension of file
+        filename, extension = os.path.splitext(audio_filepath)
+        if extension != ".wav":
+            continue
 
-#         # Set up filename for feature extraction file
-#         feature_filename = filename + '.txt'
-#         feature_filepath= os.path.join(actor_folderpath, feature_filename)
+        # Set up filename for feature extraction file
+        feature_filename = filename + '.txt'
+        feature_filepath= os.path.join(actor_folderpath, feature_filename)
 
-#         # Set up filename for articulation
-#         articulation_filename = filename+'.articulation.txt'
-#         articulation_filepath = os.path.join(actor_folderpath, articulation_filename)
-#         articulation_info.append((audio_filepath, articulation_filepath))
+        # Set up filename for articulation
+        articulation_filename = filename+'.articulation.txt'
+        articulation_filepath = os.path.join(actor_folderpath, articulation_filename)
+        articulation_info.append((audio_filepath, articulation_filepath))
 
-#         # Set up file info for phonation
-#         phonation_filename = filename+'.phonation.txt'
-#         phonation_filepath = os.path.join(actor_folderpath, phonation_filename)
-#         phonation_info.append((audio_filepath, phonation_filepath))
+        librosa_mfcc_filename = filename+'.librosa_mfcc.txt'
+        librosa_mfcc_filepath = os.path.join(actor_folderpath, librosa_mfcc_filename)
+        # librosa_mfcc_info.append((audio_filepath, articulation_filepath))
+
+        # Set up file info for phonation
+        phonation_filename = filename+'.phonation.txt'
+        phonation_filepath = os.path.join(actor_folderpath, phonation_filename)
+        phonation_info.append((audio_filepath, phonation_filepath))
+
+        # X, sample_rate = librosa.load(audio_filepath, res_type='kaiser_fast')
+        # mfccs = numpy.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0) 
+
+        # print(librosa_mfcc_filename)
+        # with open(librosa_mfcc_filename,'w') as outfile:
+        #     mfccs = [str(mfcc) for mfcc in mfccs]
+        #     outfile.write(" ".join(mfccs))
+        # sys.exit()
 
         # # Run feature extraction on this file
         # print("python3 ./" + DISVOICE_FOLDER + "/prosody/prosody.py {} {}".format(audio_filepath, feature_filepath))
@@ -66,7 +79,7 @@ cwd = os.getcwd()
 
 
 
-song_articulation_info = []
+# song_articulation_info = []
 
 # Song data
 os.chdir(cwd)
@@ -88,7 +101,18 @@ for actor_folder in os.listdir(SONG_FOLDER):
         # Set up filename for articulation
         articulation_filename = filename+'.articulation.txt'
         articulation_filepath = os.path.join(actor_folderpath, articulation_filename)
-        song_articulation_info.append((audio_filepath, articulation_filepath))
+        # song_articulation_info.append((audio_filepath, articulation_filepath))
+
+        librosa_mfcc_filename = filename+'.librosa_mfcc.txt'
+        librosa_mfcc_filepath = os.path.join(actor_folderpath, librosa_mfcc_filename)
+
+        X, sample_rate = librosa.load(audio_filepath, res_type='kaiser_fast')
+        mfccs = numpy.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0) 
+
+        print(librosa_mfcc_filename)
+        with open(librosa_mfcc_filename,'w') as outfile:
+            mfccs = [str(mfcc) for mfcc in mfccs]
+            outfile.write(" ".join(mfccs))
 
         # # Run feature extraction on this file
         # print("python3 ./" + DISVOICE_FOLDER + "/prosody/prosody.py {} {}".format(audio_filepath, feature_filepath))
@@ -96,17 +120,17 @@ for actor_folder in os.listdir(SONG_FOLDER):
         # if int(res) != 0:
         #     to_delete.append(audio_filepath)
 
-# Change working directory to DisVoice articulation folder
-articulation_folder = os.path.join(cwd, DISVOICE_FOLDER, "articulation")
-# print(articulation_folder)
-os.chdir(articulation_folder)
-for audio_filepath, articulation_filepath in song_articulation_info:
-    # Run feature extraction on this file
-    print("python3 articulation.py {} {}".format(audio_filepath, articulation_filepath))
-    res = os.system("python3 articulation.py {} {}".format(audio_filepath, articulation_filepath))
-    if int(res) != 0:
-        to_delete.append(audio_filepath)
-    # print(articulation_filepath)
+# # Change working directory to DisVoice articulation folder
+# articulation_folder = os.path.join(cwd, DISVOICE_FOLDER, "articulation")
+# # print(articulation_folder)
+# os.chdir(articulation_folder)
+# for audio_filepath, articulation_filepath in song_articulation_info:
+#     # Run feature extraction on this file
+#     print("python3 articulation.py {} {}".format(audio_filepath, articulation_filepath))
+#     res = os.system("python3 articulation.py {} {}".format(audio_filepath, articulation_filepath))
+#     if int(res) != 0:
+#         to_delete.append(audio_filepath)
+#     # print(articulation_filepath)
 
 
 
