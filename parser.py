@@ -145,6 +145,7 @@ class AudioFile():
         line_arr = [self.filename, self.emotion_int, self.vocal_channel, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
         line_arr += self.features
         line_arr += self.mfcc_features
+        # print(len(line_arr))
         line_arr = [str(item) for item in line_arr]
         return ",".join(line_arr)
     
@@ -1094,6 +1095,7 @@ class AudioParser():
     def header_combined_csv(self):
         header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
         line = header + self.prosody_features + self.librosa_mfcc_headers
+        # print(len(line))
         return ",".join(line)
     
     def header_mfcc_only(self):
@@ -1132,6 +1134,8 @@ def create_dataset():
     with open(COMBINED_DATA_FILE, 'w') as outfile:
         outfile.write("{}\n".format(a.header_combined_csv()))
         for audio_item in a.audio_files:
+            outfile.write("{}\n".format(audio_item.to_csv_combined_line()))
+        for audio_item in a.song_files:
             outfile.write("{}\n".format(audio_item.to_csv_combined_line()))
 
     # MFCC
