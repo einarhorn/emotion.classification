@@ -144,7 +144,7 @@ class AudioFile():
     def to_csv_combined_line(self):
         line_arr = [self.filename, self.emotion_int, self.vocal_channel, self.emotion_intensity_int, self.statement, self.repetition, self.actor_id, self.gender_int]
         line_arr += self.features
-        line_arr += self.articulation_features
+        line_arr += self.mfcc_features
         line_arr = [str(item) for item in line_arr]
         return ",".join(line_arr)
     
@@ -1093,7 +1093,7 @@ class AudioParser():
     
     def header_combined_csv(self):
         header = ["filename", "emotion", "vocal channel (speech/song)", "emotion_intensity", "statement", "repretition", "actor_id", "gender_int"]
-        line = header + self.prosody_features + self.articulation_features
+        line = header + self.prosody_features + self.librosa_mfcc_headers
         return ",".join(line)
     
     def header_mfcc_only(self):
