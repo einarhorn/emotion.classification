@@ -1,0 +1,70 @@
+Feature,P-value,F-val,Significance
+MFCC[31],0.0,486.81,Significant
+MFCC[32],0.0,348.46,Significant
+MFCC[1],0.0,319.04,Significant
+MFCC[36],0.0,220.18,Significant
+MFCC[34],0.0,184.21,Significant
+MFCC[30],0.0,149.2,Significant
+MFCC[37],0.0,141.01,Significant
+MFCC[35],0.0,136.05,Significant
+MFCC[38],0.0,109.16,Significant
+MFCC[39],0.0,88.52,Significant
+MFCC[33],0.0,86.15,Significant
+MFCC[3],0.0,76.38,Significant
+Average duration of voiced segments,0.0,68.46,Significant
+MFCC[19],0.0,53.66,Significant
+Average fundamental frequency in voiced segments,0.0,47.15,Significant
+(Voiced duration)/(Silence durations),0.0,47.02,Significant
+Standard deviation of fundamental frequency in Hz,0.0,37.49,Significant
+Minimum duration of voiced segments,0.0,34.94,Significant
+Average energy in dB,0.0,33.38,Significant
+Regression coefficient between the F0 contour and a linear regression,0.0,32.75,Significant
+MFCC[40],0.0,30.82,Significant
+Maximum energy,0.0,29.37,Significant
+Average duration of pauses,0.0,27.94,Significant
+MFCC[6],0.0,27.84,Significant
+MFCC[20],0.0,27.12,Significant
+Tilt regularity of fundamental frequency,0.0,23.92,Significant
+MFCC[25],0.0,23.8,Significant
+MFCC[15],0.0,21.77,Significant
+MFCC[22],0.0,21.66,Significant
+MFCC[7],0.0,20.51,Significant
+MFCC[24],0.0,20.42,Significant
+Standard deviation of duration of pauses ,0.0,19.52,Significant
+Voiced energy Regularity,0.0,19.28,Significant
+MFCC[9],0.0,18.31,Significant
+Pause duration Regularity,0.0,17.06,Significant
+MFCC[21],0.0,16.94,Significant
+MFCC[14],0.0,16.51,Significant
+MFCC[16],0.0,15.31,Significant
+MFCC[8],0.0,15.3,Significant
+Voiced duration Regularity,0.0,14.98,Significant
+Standard deviation of Delta energy within consecutive voiced segments,0.0,14.67,Significant
+Average Delta energy within consecutive voiced segments,0.0,14.25,Significant
+MFCC[28],0.0,13.32,Significant
+MFCC[18],0.0,12.85,Significant
+MFCC[2],0.0,12.13,Significant
+Standard deviation of energy in dB,0.0,11.23,Significant
+MFCC[27],0.0,10.77,Significant
+MFCC[17],0.0,10.57,Significant
+MFCC[29],0.0,10.38,Significant
+MFCC[23],0.0,9.57,Significant
+MFCC[5],0.0,9.21,Significant
+Average tilt of fundamental frequency,0.0,8.97,Significant
+rate (# of voiced segments) / (# of unvoiced segments),0.0,8.38,Significant
+MFCC[26],0.0,7.94,Significant
+MFCC[12],2e-06,7.05,Significant
+Maximum of the fundamental frequency in Hz,5e-06,6.57,Significant
+MFCC[11],9e-06,6.3,Significant
+MFCC[10],5.1e-05,5.51,Significant
+Unvoiced energy Regularity,0.000137,5.06,Significant
+(Voiced duration)/(Unvoiced durations),0.000235,4.81,Significant
+Mean square error of the reconstructed F0 with a 1-degree polynomial,0.000576,4.4,Significant
+MFCC[4],0.00081,4.24,Significant
+Regression coefficient between the energy contour and a linear regression,0.001702,3.89,Significant
+(Unvoiced duration)/(Silence durations),0.003188,3.59,Significant
+Average tilt of energy contour,0.005561,3.32,Significant
+Mean square error of the reconstructed energy contour with a 1-degree polynomial,0.008579,3.11,Significant
+MFCC[13],0.493724,0.88,Not Significant
+Standard deviation of duration of voiced segments,0.528834,0.83,Not Significant
+Unvoiced duration Regularity,0.975521,0.16,Not Significant

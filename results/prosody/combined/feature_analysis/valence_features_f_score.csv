@@ -1,0 +1,31 @@
+Feature,P-value,F-val,Significance
+(Voiced duration)/(Silence durations),0.0,141.28,Significant
+(Silence duration)/(Voiced+Unvoiced durations),0.0,84.87,Significant
+Pause duration Regularity,0.0,80.8,Significant
+Regression coefficient between the F0 contour and a linear regression,0.0,58.72,Significant
+rate (# of voiced segments) / (# of unvoiced segments),0.0,46.42,Significant
+Voiced energy Regularity,0.0,42.66,Significant
+Minimum duration of voiced segments,0.0,40.65,Significant
+Average Delta energy within consecutive voiced segments,0.0,35.8,Significant
+Unvoiced energy Regularity,0.0,32.7,Significant
+Average fundamental frequency in voiced segments,0.0,30.31,Significant
+Average duration of voiced segments,0.0,29.46,Significant
+Average energy in dB,0.0,24.19,Significant
+Maximum of the fundamental frequency in Hz,0.0,23.96,Significant
+Standard deviation of Delta energy within consecutive voiced segments,0.0,23.45,Significant
+Tilt regularity of fundamental frequency,0.0,17.79,Significant
+Mean square error of the reconstructed energy contour with a 1-degree polynomial,0.0,15.96,Significant
+Regression coefficient between the energy contour and a linear regression,0.0,15.52,Significant
+Standard deviation of duration of pauses ,1.4e-05,11.24,Significant
+Standard deviation of energy in dB,2.4e-05,10.67,Significant
+Voiced duration Regularity,4.4e-05,10.08,Significant
+Average duration of pauses,0.000103,9.21,Significant
+Standard deviation of fundamental frequency in Hz,0.00013,8.98,Significant
+Mean square error of the reconstructed F0 with a 1-degree polynomial,0.000702,7.28,Significant
+Average tilt of fundamental frequency,0.003878,5.57,Significant
+Average tilt of energy contour,0.010588,4.56,Significant
+Standard deviation of duration of voiced segments,0.02715,3.61,Significant
+Maximum energy,0.145122,1.93,Not Significant
+(Voiced duration)/(Unvoiced durations),0.699016,0.36,Not Significant
+(Unvoiced duration)/(Silence durations),0.807557,0.21,Not Significant
+Unvoiced duration Regularity,0.808464,0.21,Not Significant
